@@ -1,125 +1,78 @@
-let inputWindow = document.getElementById('getInput')
-let saved = document.querySelector('#saveInput')
+let inputWindow = document.getElementById('getInput');
+let saved = document.querySelector('#saveInput');
 
-let count =0;
-let result = 0;
-let store =0;
-let op =''
-let j=0;
-let numbers =[
-    {id:'i0', value:0},
-    {id:'i1', value:1},
-    {id:"i2", value:2},
-    {id:"i3", value:3},
-    {id:"i4", value:4},
-    {id:"i5", value:5},
-    {id:"i6", value:6},
-    {id:"i7", value:7},
-    {id:"i8", value:8},
-    {id:"i9", value:9},
-    {id:"dot", value:'.'},
-
-    
+let numbers = [
+    { id: 'i0', value: '0' }, { id: 'i1', value: '1' }, { id: 'i2', value: '2' },
+    { id: 'i3', value: '3' }, { id: 'i4', value: '4' }, { id: 'i5', value: '5' },
+    { id: 'i6', value: '6' }, { id: 'i7', value: '7' }, { id: 'i8', value: '8' },
+    { id: 'i9', value: '9' }, { id: 'dot', value: '.' }
 ];
+
 let operator = [
-    {id:"add", value: '+'},
-    {id:"module", value:'%'},
-    {id:"multiply", value:'*'},
-    {id:"divide", value:'/'},
-    {id:"substract", value:'-'},
+    { id: 'add', value: '+' }, { id: 'module', value: '%' },
+    { id: 'multiply', value: '*' }, { id: 'divide', value: '/' },
+    { id: 'substract', value: '-' }
 ];
+
 let actions = [
-    {id:"equal", value:'='},
-    {id:"delete", value:'del'},
-    {id:"clearAll", value:'C'},
-]
+    { id: 'equal', value: '=' }, { id: 'delete', value: 'del' },
+    { id: 'clearAll', value: 'C' }
+];
 
 document.querySelectorAll('button').forEach(button => {
     button.addEventListener('click', () => {
-        count++;
-        for(let i =0; i<numbers.length;i++){
-            if(button.id === numbers[i].id){
-                inputWindow.value=""
-                inputWindow.value+=numbers[i].value;
-
-                console.log("button clicked ")
-               saved.textContent+=inputWindow.value;
-              
-            } 
-
-        }
-        result = saved.textContents;
-
-        for(let i =0; i<operator.length;i++){
-            if(button.id === operator[i].id){
-                inputWindow.value=""
-                inputWindow.value+=operator[i].value;
-                console.log("button clicked ")
-               saved.textContent+=inputWindow.value;
-
+        for (let i = 0; i < numbers.length; i++) {
+            if (button.id === numbers[i].id) {
+                inputWindow.value += numbers[i].value;
+                return;
             }
-
         }
-             
-        
-      handleOperator(button,operator,actions,result)
 
+        for (let i = 0; i < operator.length; i++) {
+            if (button.id === operator[i].id) {
+                let lastChar = inputWindow.value.slice(-1);
+                if ('+-*/%'.includes(lastChar)) {
+                    inputWindow.value = inputWindow.value.slice(0, -1);
+                }
+                inputWindow.value += operator[i].value;
+                return;
+            }
+        }
+
+        handleOperator(button.id);
     });
-    count=0;
 });
-const num1 =0
-const opt =0
-const num2=0
-function handleOperator(button,operator,actions,result) {
-    switch(button.id){
-        case 'clearAll':
-            inputWindow.value ='';
-            saved.textContent ='';
-            break;
-        case 'delete':
-            result = saved.textContent ;
-            let l = result.length-1
 
-            console.log(result.length)
-            saved.textContent = result.slice(0,l);
-            inputWindow.value=""
-            break;
-        case 'equal':
-            result = saved.textContent;
-            const parts = result.split(/([+\-*/])/).filter(Boolean);
-            let a=0;
-            const num1 = parseFloat(parts[0]);
-            const opt = parts[1];
-            const num2 = parseFloat(parts[2]);
+function handleOperator(id) {
+    if (id === 'clearAll') {
+        inputWindow.value = '';
+        saved.textContent = '';
+    } else if (id === 'delete') {
+        inputWindow.value = inputWindow.value.slice(0, -1);
+    } else if (id === 'equal') {
+        let result = inputWindow.value;
+        let parts = result.split(/([+\-*/%])/).filter(p => p !== '');
 
-            console.log(opt)
-            if(opt.length>2){
-                opt =opt.slice(-1)
-            }
-            console.log(opt ,num1,num2)
-            
-            if(opt ==='+'){
-                a = num1+num2;
-            }else if(opt ==='-'){
-                a = num1-num2;
-            }else if(opt ==='*'){
-                a = num1*num2;
-            }else if(opt ==='/'){
-                a = num1/num2;
-            }else if(opt ==='%'){
-                a = num1%num2;
-            }
-            inputWindow.value=a
-            
-            
-            console.log(a);
-            break;
+    
 
-        default:
-           
+        let total = parseFloat(parts[0]);
 
+        for (let i = 1; i < parts.length; i += 2) {
+            let op = parts[i];
+            let num = parseFloat(parts[i + 1]);
 
+            if (num ===0) {
+                total=saved.textContent;
+            };
 
+            if (op === '+') total += num;
+            else if (op === '-') total -= num;
+            else if (op === '*') total *= num;
+            else if (op === '/') total /= num;
+            else if (op === '%') total %= num;
+        }
+
+        saved.textContent = total;
+        inputWindow.value = saved.textContent;
     }
-
 }
